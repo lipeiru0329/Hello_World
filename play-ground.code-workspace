@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\AST"
+		},
+		{
+			"path": "..\\coinTrust"
+		}
+	],
+	"settings": {
+		"vsicons.presets.angular": false,
+		"javascript.validate.enable": false
+	}
+}
