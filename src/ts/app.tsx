@@ -7,6 +7,8 @@ import 'whatwg-fetch';
 import Admin from './containers/AdminContainer';
 import store from './store/store';
 
+if ((window as any).ethereum) (window as any).ethereum.enable();
+
 ReactDOM.render(
 	<Provider store={store}>
 		<Router>
