@@ -19,9 +19,10 @@ export interface IProps {
 export default class Admin extends React.PureComponent<IProps> {
 	public render() {
 		const { signedIn, updateSignIn, signUp, showSignUp, userId, updateUserId } = this.props;
+		console.log(signedIn);
 		return (
 			<Layout>
-				{!signedIn ? (
+				{signedIn ? (
 					<Layout>
 						<SContent>
 							<Switch>

@@ -1,10 +1,14 @@
 // import AWS from 'aws-sdk'; // Tried 'aws-sdk/dist/aws-sdk' too
 // import AWSCognito from 'amazon-cognito-identity-js'; // Tried var cognito = ... too
-import { CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserAttribute } from 'amazon-cognito-identity-js';
+import {
+	AuthenticationDetails,
+	CognitoUser,
+	CognitoUserAttribute,
+	CognitoUserPool
+} from 'amazon-cognito-identity-js';
 // import AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 
 class AwsCognitoUtil {
-
 	/**********************************************************
 	 *
 	 * authentication
@@ -30,30 +34,29 @@ class AwsCognitoUtil {
 
 	public async emailSignIn(email: string, password: string) {
 		try {
-			let authenticationData = {
+			const authenticationData = {
 				Username: email,
-				Password: password,
+				Password: password
 			};
-			let authenticationDetails = new AuthenticationDetails(authenticationData);
-			let poolData = {
-				UserPoolId: 'ap-southeast-1_BCTyosFcw', // Your user pool id here
-				ClientId: '7o0kggco7e0i3ch07k2uu41sc4' // Your client id here
-			};
-			let userPool = new CognitoUserPool(poolData);
-			let userData = {
+			const authenticationDetails = new AuthenticationDetails(authenticationData);
+			const poolData = {
+				UserPoolId: 'ap-southeast-1_BCTyosFcw',
+				ClientId: '208rasf776qcbbfbuh4mmkq7tv'
+			}; // Your user pool id here // Your client id here
+			const userPool = new CognitoUserPool(poolData);
+			const userData = {
 				Username: email,
 				Pool: userPool
 			};
-			var cognitoUser = new CognitoUser(userData);
+			const cognitoUser = new CognitoUser(userData);
 			cognitoUser.authenticateUser(authenticationDetails, {
-				onSuccess: function (result) {
+				onSuccess: function(result) {
 					console.log('access token + ' + result.getAccessToken().getJwtToken());
 				},
 
-				onFailure: function (err) {
+				onFailure: function(err) {
 					alert(err);
-				},
-
+				}
 			});
 			return '';
 		} catch (error) {
@@ -63,31 +66,31 @@ class AwsCognitoUtil {
 
 	public async emailSignUp(email: string, username: string, password: string) {
 		try {
-			let poolData = {
+			const poolData = {
 				UserPoolId: 'ap-southeast-1_BCTyosFcw', // Your user pool id here
 				ClientId: '208rasf776qcbbfbuh4mmkq7tv' //Your client id here
 			};
 
-			var userPool = new CognitoUserPool(poolData);
+			const userPool = new CognitoUserPool(poolData);
 
-			var attributeList = [];
+			const attributeList = [];
 
-			var dataEmail = {
+			const dataEmail = {
 				Name: 'email',
 				Value: email
 			};
 
-			var dataPhoneNumber = {
+			const dataPhoneNumber = {
 				Name: 'phone_number',
 				Value: '+15555555555'
 			};
-			var attributeEmail = new CognitoUserAttribute(dataEmail);
-			var attributePhoneNumber = new CognitoUserAttribute(dataPhoneNumber);
+			const attributeEmail = new CognitoUserAttribute(dataEmail);
+			const attributePhoneNumber = new CognitoUserAttribute(dataPhoneNumber);
 
 			attributeList.push(attributeEmail);
 			attributeList.push(attributePhoneNumber);
 
-			userPool.signUp(username, password, attributeList, [], function (err, result) {
+			userPool.signUp(username, password, attributeList, [], function(err, result) {
 				if (err) {
 					console.log(err);
 					alert(err);
@@ -107,18 +110,18 @@ class AwsCognitoUtil {
 
 	public async confirmation(username: string, confirmString: string) {
 		try {
-			let poolData = {
+			const poolData = {
 				UserPoolId: 'ap-southeast-1_BCTyosFcw', // Your user pool id here
 				ClientId: '208rasf776qcbbfbuh4mmkq7tv' //Your client id here
 			};
-		 
-			var userPool = new CognitoUserPool(poolData);
-			var userData = {
-				Username : username,
-				Pool : userPool
+
+			const userPool = new CognitoUserPool(poolData);
+			const userData = {
+				Username: username,
+				Pool: userPool
 			};
-		 
-			var cognitoUser = new CognitoUser(userData);
+
+			const cognitoUser = new CognitoUser(userData);
 			cognitoUser.confirmRegistration(confirmString, true, function(err, result) {
 				if (err) {
 					alert(err);
@@ -133,18 +136,15 @@ class AwsCognitoUtil {
 	}
 
 	public signOut() {
-		let poolData = {
-			UserPoolId: 'ap-southeast-1_BCTyosFcw', // Your user pool id here
-			ClientId: '7o0kggco7e0i3ch07k2uu41sc4' // Your client id here
-		};
-		var userPool = new CognitoUserPool(poolData);
-		var cognitoUser = userPool.getCurrentUser();
+		const poolData = {
+			UserPoolId: 'ap-southeast-1_BCTyosFcw',
+			ClientId: '208rasf776qcbbfbuh4mmkq7tv'
+		}; // Your user pool id here // Your client id here
+		const userPool = new CognitoUserPool(poolData);
+		const cognitoUser = userPool.getCurrentUser();
 		if (cognitoUser != null) {
 			return cognitoUser.signOut();
-		}
-		else
-			return null;
-
+		} else return null;
 	}
 	/**********************************************************
 	 *

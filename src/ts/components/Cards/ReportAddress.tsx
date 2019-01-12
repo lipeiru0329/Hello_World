@@ -1,8 +1,8 @@
 import { Radio } from 'antd';
 // import { Icon } from 'antd';
 import { Input } from 'antd';
-
 import { Icon, notification } from 'antd';
+import AWS from 'aws-sdk';
 import * as React from 'react';
 import ImageUploader from 'react-images-upload';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
@@ -10,14 +10,24 @@ import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
 
+// AWS.config.loadFromPath(`ts/key/admin.json`);
+const s3 = new AWS.S3({
+	apiVersion: '2006-03-01',
+	accessKeyId: 'AKIAI4IGSPJJZVEEXYSQ',
+	secretAccessKey: '5HHZs2EvbcraoXNBwP/RAnvT+jAmRvlPOYrUNE5b',
+	region: 'ap-southeast-1'
+});
+// Configure AWS with your access and secret key. I stored mine as an ENV on the server
+// ie: process.env.ACCESS_KEY_ID = "abcdefg"
+
 const { TextArea } = Input;
 const config = require(`ts/key/admin.json`);
 dynamoUtil.init(config);
 
-const openNotification = () => {
+const openNotification = (e?: string) => {
 	notification.open({
 		message: 'Notification Title',
-		description: 'Thanks for your report',
+		description: e || 'Thanks for your report',
 		icon: <Icon type="smile" style={{ color: '#108ee9' }} />
 	});
 };
@@ -32,16 +42,11 @@ interface IState {
 	text: string;
 	chain: string;
 }
-
+let base64 = '';
 export default class ReportAddress extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
-		this.state = {
-			address: '',
-			text: '',
-			pictures: [],
-			chain: ''
-		};
+		this.state = { address: '', text: '', pictures: [], chain: '' };
 	}
 
 	// private normFile = (e: any) => {
@@ -62,27 +67,28 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 	// };
 
 	private handleTextChange = (e: any) => {
-		this.setState({
-			text: e.target.value
-		});
+		this.setState({ text: e.target.value });
 	};
-	private onDrop = (pictureFiles: any) => {
+	private onDrop = (pictureFiles: any, pictureDataURLs: any) => {
 		console.log(pictureFiles);
+		console.log(typeof pictureFiles);
+		console.log(pictureFiles[0].src);
+		console.log(pictureDataURLs);
+		base64 =
+			(document.getElementsByClassName('uploadPicture')[0] &&
+				document.getElementsByClassName('uploadPicture')[0].getAttribute('src')) ||
+			'';
 		this.setState({
 			pictures: this.state.pictures.concat(pictureFiles)
 		});
 	};
 
 	private handleAddressChange = (add: string) => {
-		this.setState({
-			address: add
-		});
+		this.setState({ address: add });
 	};
 
 	private handleRadioChange = (e: any) => {
-		this.setState({
-			chain: e.target.value
-		});
+		this.setState({ chain: e.target.value });
 	};
 	private handleSubmit = () => {
 		// const { userId } = this.props;
@@ -106,7 +112,28 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 				twitter: 'a',
 				chain: chain
 			})
-			.then(openNotification);
+			.then(openNotification() as any);
+
+		const base64Data = new Buffer(base64.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+		const type = base64.split(';')[0].split('/')[1];
+		const userId = 1;
+		const params = {
+			Bucket: 'address-proof-image',
+			Key: `${userId}.${type}`,
+			Body: base64Data,
+			ACL: 'public-read',
+			ContentEncoding: 'base64',
+			ContentType: `image/${
+				type // type is not required // required
+			}`
+		}; // required. Notice the back ticks
+		console.log(params);
+		s3.upload(params, (err: any, data: any) => {
+			if (err) return console.log(err);
+			console.log(data);
+			console.log('Image successfully uploaded.');
+			openNotification('Image successfully uploaded.');
+		});
 		console.log('test');
 	};
 
@@ -193,7 +220,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 						<ImageUploader
 							withIcon={true}
 							buttonText="Choose images"
-							onChange={(e: any) => this.onDrop(e)}
+							onChange={(e: any) => this.onDrop(e, e.webkitRelativePath)}
 							imgExtension={['.jpg', '.gif', '.png', '.gif']}
 							maxFileSize={5242880}
 							withPreview={true}

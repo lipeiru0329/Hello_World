@@ -56,6 +56,7 @@ export default class AuthCard extends React.Component<IProps, IState> {
 		const { updateSignIn, updateUserId } = this.props;
 		this.setState({ loading: true });
 		awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
+			console.log(error);
 			this.setState({
 				loginError: error,
 				loading: false
@@ -70,6 +71,7 @@ export default class AuthCard extends React.Component<IProps, IState> {
 		if (key === 'Enter') {
 			this.setState({ loading: true });
 			awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
+				console.log(error);
 				this.setState({
 					loginError: error,
 					loading: false

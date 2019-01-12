@@ -20,11 +20,11 @@ export function firebaseReducer(
 				  })
 				: initialState;
 		case CST.AC_USERID:
-			if (action.value)
-				return Object.assign({}, state, {
-					[CST.AC_USERID]: action.value
-				});
-			else return initialState;
+			return action[CST.AC_USERID]
+				? Object.assign({}, state, {
+						[CST.AC_USERID]: action[CST.AC_USERID]
+				  })
+				: initialState;
 		default:
 			return state;
 	}
