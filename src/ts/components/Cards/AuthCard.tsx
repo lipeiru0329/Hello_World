@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as CST from 'ts/common/constants';
-import firebaseUtil from 'ts/common/firebaseUtil';
+import awsCognitoUtil from 'ts/common/awsCognitoUtil';
 import { SDivFlexCenter } from '../_styled';
 import { SCard, SCardList, SCardTitle, SInput } from './_styled';
 
@@ -41,7 +41,7 @@ export default class AuthCard extends React.Component<{}, IState> {
 
 	private handleSignIn = () => {
 		this.setState({ loading: true });
-		firebaseUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
+		awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
 			this.setState({
 				loginError: error,
 				loading: false
@@ -52,7 +52,7 @@ export default class AuthCard extends React.Component<{}, IState> {
 	private handleKeyPress = (key: string) => {
 		if (key === 'Enter') {
 			this.setState({ loading: true });
-			firebaseUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
+			awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
 				this.setState({
 					loginError: error,
 					loading: false
