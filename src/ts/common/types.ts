@@ -9,4 +9,5 @@ export interface IState {
 
 export interface IFirebaseState {
 	readonly auth: boolean;
+	readonly signup: boolean;
 }

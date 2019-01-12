@@ -71,5 +71,5 @@ export const ColorStyles = {
 	BeethovenTokenAColor: 'rgba(105,188,255,0.8)',
 	BeethovenTokenBCollar: 'rgba(245,122,15,0.8)',
 	MozartTokenAColor: '',
-	MozartTokenBColor: ''
+	MozartTokenBColor: '',
 };

@@ -1,8 +1,13 @@
 import * as React from 'react';
-import * as CST from 'ts/common/constants';
 import awsCognitoUtil from 'ts/common/awsCognitoUtil';
+import * as CST from 'ts/common/constants';
 import { SDivFlexCenter } from '../_styled';
 import { SCard, SCardList, SCardTitle, SInput } from './_styled';
+
+interface IProps {
+	showSignUp: (e: boolean) => void;
+	updateSignIn: (e: boolean) => void;
+}
 
 interface IState {
 	account: string;
@@ -11,7 +16,7 @@ interface IState {
 	loading: boolean;
 }
 
-export default class AuthCard extends React.Component<{}, IState> {
+export default class AuthCard extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -39,7 +44,14 @@ export default class AuthCard extends React.Component<{}, IState> {
 			loginError: ''
 		});
 
+	private signUp = () => {
+		const { showSignUp } = this.props;
+		console.log('123');
+		showSignUp(true);
+	};
+
 	private handleSignIn = () => {
+		const { updateSignIn } = this.props;
 		this.setState({ loading: true });
 		awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
 			this.setState({
@@ -47,9 +59,11 @@ export default class AuthCard extends React.Component<{}, IState> {
 				loading: false
 			});
 		});
+		updateSignIn(true);
 	};
 
 	private handleKeyPress = (key: string) => {
+		const { updateSignIn } = this.props;
 		if (key === 'Enter') {
 			this.setState({ loading: true });
 			awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
@@ -58,6 +72,7 @@ export default class AuthCard extends React.Component<{}, IState> {
 					loading: false
 				});
 			});
+			updateSignIn(true);
 		}
 	};
 
@@ -124,6 +139,10 @@ export default class AuthCard extends React.Component<{}, IState> {
 											{CST.TH_CLEAR.toUpperCase()}
 										</button>
 									</SDivFlexCenter>
+								</li>
+								<li>
+									Do not have an account, please{' '}
+									<button onClick={() => this.signUp()}>Sign Up</button>
 								</li>
 								{loginError ? (
 									<li className="error-line no-bg">{loginError}</li>

@@ -30,6 +30,33 @@ export const SCard = styled(Card)`
 	}
 `;
 
+export interface ISButtonProps {
+	width?: string;
+	disable?: boolean;
+}
+
+export const SButton = styled.button`
+	pointer-events: ${(props: ISButtonProps) => (props.disable ? 'none' : 'auto')};
+	cursor: pointer;
+	outline: none;
+	height: 30px;
+	width: ${(props: ISButtonProps) => (props.width ? props.width : '100%')};
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid ${ColorStyles.MainColor};
+	border-radius: 2px;
+	color: ${ColorStyles.MainColor};
+	background-color: #fff;
+	font-size: 14px;
+	transition: all 0.2s;
+	&:hover {
+		background: ${ColorStyles.MainColor};
+		color: ${ColorStyles.TextWhite};
+		box-shadow: 0 0 4px 1px ${ColorStyles.MainColorShadow};
+	}
+`;
+
 injectGlobal([
 	`
 	body {
@@ -551,6 +578,7 @@ export const SCardList = styled.div`
 		}
 	}
 `;
+
 export interface ICardListProgressBarProps {
 	index: number;
 	total: number;

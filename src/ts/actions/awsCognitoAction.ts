@@ -6,3 +6,7 @@ export function authUpdate(signedIn: boolean) {
 		[CST.AC_AUTH]: signedIn
 	};
 }
+
+export function signUpUpdate(signUp: boolean) {
+	return { type: CST.AC_SIGNUP, [CST.AC_AUTH]: signUp };
+}

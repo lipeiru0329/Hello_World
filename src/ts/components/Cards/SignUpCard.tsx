@@ -1,11 +1,11 @@
 import * as React from 'react';
-import * as CST from 'ts/common/constants';
 import awsCognitoUtil from 'ts/common/awsCognitoUtil';
+import * as CST from 'ts/common/constants';
 import { SDivFlexCenter } from '../_styled';
 import { SCard, SCardList, SCardTitle, SInput } from './_styled';
 
 interface IProps {
-	updateSignIn: () => void;
+	updateSignIn: (e: boolean) => void;
 }
 interface IState {
 	account: string;
@@ -17,7 +17,7 @@ interface IState {
 	confirmMsg: string;
 }
 
-export default class SignUpCard extends React.Component<IProps, IState>{
+export default class SignUpCard extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
@@ -27,17 +27,19 @@ export default class SignUpCard extends React.Component<IProps, IState>{
 			email: '',
 			loading: false,
 			confirm: false,
-			confirmMsg: '',
+			confirmMsg: ''
 		};
 	}
 
-	private handleAccountChange = (acc: string) => this.setState({
-		account: acc
-	});
+	private handleAccountChange = (acc: string) =>
+		this.setState({
+			account: acc
+		});
 
-	private handleEmailChange = (email: string) => this.setState({
-		email: email
-	});
+	private handleEmailChange = (email: string) =>
+		this.setState({
+			email: email
+		});
 
 	private handlePasswordChange = (pass: string) =>
 		this.setState({
@@ -51,54 +53,56 @@ export default class SignUpCard extends React.Component<IProps, IState>{
 			loginError: ''
 		});
 
-	private handleConfirmChange = (msg: string) => this.setState({
-		confirmMsg: msg
-	});
-	
+	private handleConfirmChange = (msg: string) =>
+		this.setState({
+			confirmMsg: msg
+		});
+
 	private handleSignUp = () => {
 		this.setState({ confirm: true });
-		awsCognitoUtil.emailSignUp(this.state.email, this.state.account, this.state.password).catch(error => {
-			this.setState({
-				loginError: error,
-				loading: false,
-				confirm: false,
+		awsCognitoUtil
+			.emailSignUp(this.state.email, this.state.account, this.state.password)
+			.catch(error => {
+				this.setState({
+					loginError: error,
+					loading: false,
+					confirm: false
+				});
 			});
-		});
 	};
 
 	private handleKeyPress = (key: string) => {
 		if (key === 'Enter') {
 			this.setState({ confirm: true });
-			awsCognitoUtil.emailSignUp(this.state.email, this.state.account, this.state.password).catch(error => {
-				this.setState({
-					loginError: error,
-					loading: false,
-					confirm: false,
+			awsCognitoUtil
+				.emailSignUp(this.state.email, this.state.account, this.state.password)
+				.catch(error => {
+					this.setState({
+						loginError: error,
+						loading: false,
+						confirm: false
+					});
 				});
-			});
 		}
 	};
 
 	private handleConfirm = () => {
+		const { updateSignIn } = this.props;
 		this.setState({ loading: true });
 		awsCognitoUtil.confirmation(this.state.account, this.state.confirmMsg).catch(error => {
 			this.setState({
 				loginError: error,
 				loading: false,
-				confirm: false,
+				confirm: false
 			});
 		});
-		this.props.updateSignIn();
+		updateSignIn(true);
 	};
 
 	public render() {
 		const { account, password, loginError, loading, email, confirm, confirmMsg } = this.state;
 		return (
-			<SCard
-				title={<SCardTitle>Sign Up</SCardTitle>}
-				width="460px"
-				margin="200px 0 0 0"
-			>
+			<SCard title={<SCardTitle>Sign Up</SCardTitle>} width="460px" margin="200px 0 0 0">
 				<SDivFlexCenter horizontal padding="0 10px">
 					<SCardList>
 						<div className="status-list-wrapper">
@@ -117,7 +121,9 @@ export default class SignUpCard extends React.Component<IProps, IState>{
 									/>
 								</li>
 								<li
-									className={'input-line no-bg' + (loading ? ' input-disabled' : '')}
+									className={
+										'input-line no-bg' + (loading ? ' input-disabled' : '')
+									}
 								>
 									<span className="title">{CST.TH_ACCOUNT}</span>
 									<SInput
@@ -181,7 +187,8 @@ export default class SignUpCard extends React.Component<IProps, IState>{
 													<ul>
 														<li
 															className={
-																'input-line no-bg' + (loading ? ' input-disabled' : '')
+																'input-line no-bg' +
+																(loading ? ' input-disabled' : '')
 															}
 														>
 															<span className="title">CONFIRM</span>
@@ -189,7 +196,11 @@ export default class SignUpCard extends React.Component<IProps, IState>{
 																placeholder="CONFIRM"
 																width="280px"
 																value={confirmMsg}
-																onChange={e => this.handleConfirmChange(e.target.value)}
+																onChange={e =>
+																	this.handleConfirmChange(
+																		e.target.value
+																	)
+																}
 															/>
 														</li>
 														<li>
