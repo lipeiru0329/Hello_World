@@ -1,5 +1,6 @@
 export const AC_AUTH = 'auth';
 
+export const AC_USERID = 'userid';
 export const AC_SIGNUP = 'signup';
 export const TH_LOGIN = 'Admin Login';
 export const TH_LOGOUT = 'Log out';

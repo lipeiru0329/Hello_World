@@ -2,31 +2,45 @@ import { Radio } from 'antd';
 // import { Icon } from 'antd';
 import { Input } from 'antd';
 
+import { Icon, notification } from 'antd';
 import * as React from 'react';
 import ImageUploader from 'react-images-upload';
-// import awsCognitoUtil from 'ts/common/awsCognitoUtil';
+import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
 // import * as CST from 'ts/common/constants';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
 
 const { TextArea } = Input;
+const config = require(`ts/key/admin.json`);
+dynamoUtil.init(config);
 
+const openNotification = () => {
+	notification.open({
+		message: 'Notification Title',
+		description: 'Thanks for your report',
+		icon: <Icon type="smile" style={{ color: '#108ee9' }} />
+	});
+};
 // const { Option } = Select;
 // const Dragger = Upload.Dragger;
-
+interface IProps {
+	userId: string;
+}
 interface IState {
 	address: string;
 	pictures: any;
 	text: string;
+	chain: string;
 }
 
-export default class ReportAddress extends React.Component<{}, IState> {
+export default class ReportAddress extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
 			address: '',
 			text: '',
-			pictures: []
+			pictures: [],
+			chain: ''
 		};
 	}
 
@@ -47,9 +61,9 @@ export default class ReportAddress extends React.Component<{}, IState> {
 	// 	});
 	// };
 
-	private handleTextChange = (e: string) => {
+	private handleTextChange = (e: any) => {
 		this.setState({
-			text: e
+			text: e.target.value
 		});
 	};
 	private onDrop = (pictureFiles: any) => {
@@ -65,9 +79,36 @@ export default class ReportAddress extends React.Component<{}, IState> {
 		});
 	};
 
+	private handleRadioChange = (e: any) => {
+		this.setState({
+			chain: e.target.value
+		});
+	};
 	private handleSubmit = () => {
-		console.log("test");
-	}
+		// const { userId } = this.props;
+		const { chain } = this.state;
+		const { text, address } = this.state;
+		console.log(text);
+		console.log({
+			userId: 'userId',
+			address: address,
+			description: text,
+			link: 'a',
+			twitter: 'a',
+			chain: chain
+		});
+		dynamoUtil
+			.addPendingAddress({
+				userId: 'userId',
+				address: address,
+				description: text,
+				link: 'a',
+				twitter: 'a',
+				chain: chain
+			})
+			.then(openNotification);
+		console.log('test');
+	};
 
 	public render() {
 		// const { account, password, loginError, loading } = this.state;
@@ -96,6 +137,27 @@ export default class ReportAddress extends React.Component<{}, IState> {
 											<span className="title" style={{ color: 'black' }}>
 												Report Address
 											</span>
+											<Radio.Group
+												defaultValue="a"
+												buttonStyle="solid"
+												style={{ marginLeft: 3 }}
+												onChange={(e: any) => this.handleRadioChange(e)}
+											>
+												<Radio.Button
+													value="BTC"
+													onChange={(e: any) => this.handleRadioChange(e)}
+													style={{ width: 100 }}
+												>
+													BTC
+												</Radio.Button>
+												<Radio.Button
+													value="ETH"
+													onChange={(e: any) => this.handleRadioChange(e)}
+													style={{ width: 100 }}
+												>
+													ETH
+												</Radio.Button>
+											</Radio.Group>
 										</li>
 									</ul>
 								</div>
@@ -151,9 +213,7 @@ export default class ReportAddress extends React.Component<{}, IState> {
 								Reset
 							</SButton>
 							<SButton
-								style={{
-									opacity: Number(text && address) === 0 ? 0.3 : 1
-								}}
+								style={{ opacity: Number(text && address) === 0 ? 0.3 : 1 }}
 								width="49%"
 								onClick={this.handleSubmit}
 							>

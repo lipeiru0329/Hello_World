@@ -1,12 +1,14 @@
 import * as React from 'react';
 import awsCognitoUtil from 'ts/common/awsCognitoUtil';
 import * as CST from 'ts/common/constants';
+import { ColorStyles } from 'ts/common/styles';
 import { SDivFlexCenter } from '../_styled';
 import { SCard, SCardList, SCardTitle, SInput } from './_styled';
 
 interface IProps {
 	showSignUp: (e: boolean) => void;
 	updateSignIn: (e: boolean) => void;
+	updateUserId: (e: string) => void;
 }
 
 interface IState {
@@ -51,7 +53,7 @@ export default class AuthCard extends React.Component<IProps, IState> {
 	};
 
 	private handleSignIn = () => {
-		const { updateSignIn } = this.props;
+		const { updateSignIn, updateUserId } = this.props;
 		this.setState({ loading: true });
 		awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
 			this.setState({
@@ -60,10 +62,11 @@ export default class AuthCard extends React.Component<IProps, IState> {
 			});
 		});
 		updateSignIn(true);
+		updateUserId(this.state.account);
 	};
 
 	private handleKeyPress = (key: string) => {
-		const { updateSignIn } = this.props;
+		const { updateSignIn, updateUserId } = this.props;
 		if (key === 'Enter') {
 			this.setState({ loading: true });
 			awsCognitoUtil.emailSignIn(this.state.account, this.state.password).catch(error => {
@@ -73,6 +76,7 @@ export default class AuthCard extends React.Component<IProps, IState> {
 				});
 			});
 			updateSignIn(true);
+			updateUserId(this.state.account);
 		}
 	};
 
@@ -83,6 +87,8 @@ export default class AuthCard extends React.Component<IProps, IState> {
 				title={<SCardTitle>{CST.TH_LOGIN}</SCardTitle>}
 				width="460px"
 				margin="200px 0 0 0"
+				className="SSCard"
+				style={{ background: ColorStyles.CardBackgroundDarkSolid }}
 			>
 				<SDivFlexCenter horizontal padding="0 10px">
 					<SCardList>

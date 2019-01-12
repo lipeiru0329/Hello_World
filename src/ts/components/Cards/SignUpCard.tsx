@@ -1,11 +1,14 @@
 import * as React from 'react';
 import awsCognitoUtil from 'ts/common/awsCognitoUtil';
 import * as CST from 'ts/common/constants';
+import { ColorStyles } from 'ts/common/styles';
 import { SDivFlexCenter } from '../_styled';
 import { SCard, SCardList, SCardTitle, SInput } from './_styled';
 
 interface IProps {
 	updateSignIn: (e: boolean) => void;
+	updateUserId: (e: string) => void;
+	showSignUp: (e: boolean) => void;
 }
 interface IState {
 	account: string;
@@ -71,6 +74,12 @@ export default class SignUpCard extends React.Component<IProps, IState> {
 			});
 	};
 
+	private signUp = () => {
+		const { showSignUp } = this.props;
+		console.log('123');
+		showSignUp(false);
+	};
+
 	private handleKeyPress = (key: string) => {
 		if (key === 'Enter') {
 			this.setState({ confirm: true });
@@ -87,7 +96,7 @@ export default class SignUpCard extends React.Component<IProps, IState> {
 	};
 
 	private handleConfirm = () => {
-		const { updateSignIn } = this.props;
+		const { updateSignIn, updateUserId } = this.props;
 		this.setState({ loading: true });
 		awsCognitoUtil.confirmation(this.state.account, this.state.confirmMsg).catch(error => {
 			this.setState({
@@ -97,12 +106,19 @@ export default class SignUpCard extends React.Component<IProps, IState> {
 			});
 		});
 		updateSignIn(true);
+		updateUserId(this.state.account);
 	};
 
 	public render() {
 		const { account, password, loginError, loading, email, confirm, confirmMsg } = this.state;
 		return (
-			<SCard title={<SCardTitle>Sign Up</SCardTitle>} width="460px" margin="200px 0 0 0">
+			<SCard
+				title={<SCardTitle>Sign Up</SCardTitle>}
+				width="460px"
+				style={{ background: ColorStyles.CardBackgroundDarkSolid }}
+				className="SSCard"
+				margin="200px 0 0 0"
+			>
 				<SDivFlexCenter horizontal padding="0 10px">
 					<SCardList>
 						<div className="status-list-wrapper">
@@ -171,6 +187,10 @@ export default class SignUpCard extends React.Component<IProps, IState> {
 											{CST.TH_CLEAR.toUpperCase()}
 										</button>
 									</SDivFlexCenter>
+								</li>
+								<li>
+									Do not have an account, please{' '}
+									<button onClick={() => this.signUp()}>Sign In</button>
 								</li>
 								{loginError ? (
 									<li className="error-line no-bg">{loginError}</li>

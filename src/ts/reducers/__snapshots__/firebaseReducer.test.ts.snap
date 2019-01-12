@@ -3,11 +3,15 @@
 exports[`firebase reducer auth 1`] = `
 Object {
   "auth": true,
+  "signup": false,
+  "userid": "",
 }
 `;
 
 exports[`firebase reducer default 1`] = `
 Object {
   "auth": false,
+  "signup": false,
+  "userid": "",
 }
 `;

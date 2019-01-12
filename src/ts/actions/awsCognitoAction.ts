@@ -8,5 +8,11 @@ export function authUpdate(signedIn: boolean) {
 }
 
 export function signUpUpdate(signUp: boolean) {
-	return { type: CST.AC_SIGNUP, [CST.AC_AUTH]: signUp };
+	return { type: CST.AC_SIGNUP, [CST.AC_SIGNUP]: signUp };
+}
+
+export function updateUserId(userId: string) {
+	return {
+		type: CST.AC_USERID, [CST.AC_USERID]: userId
+	}
 }

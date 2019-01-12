@@ -2,7 +2,7 @@ import { AnyAction } from 'redux';
 import * as CST from 'ts/common/constants';
 import { IFirebaseState } from 'ts/common/types';
 
-export const initialState = { [CST.AC_AUTH]: false, [CST.AC_SIGNUP]: false };
+export const initialState = { [CST.AC_AUTH]: false, [CST.AC_SIGNUP]: false, [CST.AC_USERID]: '' };
 
 export function firebaseReducer(
 	state: IFirebaseState = initialState,
@@ -19,6 +19,12 @@ export function firebaseReducer(
 						[CST.AC_SIGNUP]: action[CST.AC_SIGNUP]
 				  })
 				: initialState;
+		case CST.AC_USERID:
+			if (action.value)
+				return Object.assign({}, state, {
+					[CST.AC_USERID]: action.value
+				});
+			else return initialState;
 		default:
 			return state;
 	}

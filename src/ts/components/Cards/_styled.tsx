@@ -73,6 +73,9 @@ injectGlobal([
 			pointer-events: none !important;
 			opacity: 0.5;
 		}
+		.SSCard {
+			background: ${ColorStyles.CardBackgroundDarkSolid} !important
+		}
 	}
 `
 ] as any);
@@ -836,7 +839,7 @@ export const SInput = styled.input`
 	font-size: ${(props: ISInputProps) => (props.small ? '9px' : '12px')};
 	background: ${ColorStyles.CardBackgroundSolid};
 	box-shadow: inset 0 1px 6px 0px rgba(0, 0, 0, 0.4);
-	color: ${ColorStyles.TextWhiteAlpha};
+	color: ${ColorStyles.TextBlackAlpha};
 	border: none;
 	width: ${(props: ISInputProps) => (props.width ? props.width : '160px')};
 	height: 28px;

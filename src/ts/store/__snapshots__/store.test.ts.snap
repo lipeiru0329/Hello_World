@@ -4,6 +4,8 @@ exports[`store actions 1`] = `
 Object {
   "firebase": Object {
     "auth": false,
+    "signup": false,
+    "userid": "",
   },
 }
 `;

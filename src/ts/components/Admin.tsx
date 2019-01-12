@@ -10,33 +10,43 @@ import SignUpCard from './Cards/SignUpCard';
 export interface IProps {
 	signedIn: boolean;
 	signUp: boolean;
+	userId: string;
 	updateSignIn: (e: boolean) => void;
 	showSignUp: (e: boolean) => void;
+	updateUserId: (e: string) => void;
 }
 
 export default class Admin extends React.PureComponent<IProps> {
 	public render() {
-		const { signedIn, updateSignIn, signUp, showSignUp } = this.props;
+		const { signedIn, updateSignIn, signUp, showSignUp, userId, updateUserId } = this.props;
 		return (
 			<Layout>
 				{!signedIn ? (
 					<Layout>
 						<SContent>
 							<Switch>
-								<Route render={() => <ReportAddress />} />
+								<Route render={() => <ReportAddress userId={userId} />} />
 							</Switch>
 						</SContent>
 					</Layout>
 				) : signUp ? (
 					<Layout>
 						<SContent>
-							<SignUpCard updateSignIn={updateSignIn} />
+							<SignUpCard
+								showSignUp={showSignUp}
+								updateSignIn={updateSignIn}
+								updateUserId={updateUserId}
+							/>
 						</SContent>
 					</Layout>
 				) : (
 					<Layout>
 						<SContent>
-							<AuthCard showSignUp={showSignUp} updateSignIn={updateSignIn} />
+							<AuthCard
+								showSignUp={showSignUp}
+								updateSignIn={updateSignIn}
+								updateUserId={updateUserId}
+							/>
 						</SContent>
 					</Layout>
 				)}
