@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "..\\coinTrust"
+		},
+		{
+			"path": "..\\astContractWrapper"
 		}
 	],
 	"settings": {
