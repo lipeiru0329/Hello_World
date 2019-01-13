@@ -22,7 +22,7 @@ export default class Admin extends React.PureComponent<IProps> {
 		console.log(signedIn);
 		return (
 			<Layout>
-				{signedIn ? (
+				{!signedIn ? (
 					<Layout>
 						<SContent>
 							<Switch>

@@ -1,255 +1,93 @@
-import { Radio } from 'antd';
+import { Icon, Layout, Menu } from 'antd';
 // import { Icon } from 'antd';
-import { Input } from 'antd';
-import { Icon, notification } from 'antd';
-import AWS from 'aws-sdk';
+// import { Input } from 'antd';
+// import { notification } from 'antd';
+// import AWS from 'aws-sdk';
 import * as React from 'react';
-import ImageUploader from 'react-images-upload';
+// import App from 'ts/components/Cards/App';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
-// import * as CST from 'ts/common/constants';
-import { SDivFlexCenter } from '../_styled';
-import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
+import ContentCard from './ContentCard';
 
-// AWS.config.loadFromPath(`ts/key/admin.json`);
-const s3 = new AWS.S3({
-	apiVersion: '2006-03-01',
-	accessKeyId: 'AKIAI4IGSPJJZVEEXYSQ',
-	secretAccessKey: '5HHZs2EvbcraoXNBwP/RAnvT+jAmRvlPOYrUNE5b',
-	region: 'ap-southeast-1'
-});
-// Configure AWS with your access and secret key. I stored mine as an ENV on the server
-// ie: process.env.ACCESS_KEY_ID = "abcdefg"
+const { Header, Content, Sider } = Layout;
 
-const { TextArea } = Input;
 const config = require(`ts/key/admin.json`);
 dynamoUtil.init(config);
 
-const openNotification = (e?: string) => {
-	notification.open({
-		message: 'Notification Title',
-		description: e || 'Thanks for your report',
-		icon: <Icon type="smile" style={{ color: '#108ee9' }} />
-	});
-};
-// const { Option } = Select;
-// const Dragger = Upload.Dragger;
 interface IProps {
 	userId: string;
 }
 interface IState {
-	address: string;
-	pictures: any;
-	text: string;
-	chain: string;
+	collapsed: boolean;
+	data: any;
+	showItem: string;
 }
-let base64 = '';
+
 export default class ReportAddress extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
-		this.state = { address: '', text: '', pictures: [], chain: '' };
+		this.state = { collapsed: false, data: null, showItem: '0' };
 	}
 
-	// private normFile = (e: any) => {
-	// 	console.log('Upload event:', e);
-	// 	// if (Array.isArray(e)) {
-	// 	// 	return e;
-	// 	// }
-	// 	// return e && e.fileList;
-	// };
-
-	// private handleCancel = () => this.setState({ previewVisible: false });
-
-	// private handlePreview = (file: any) => {
-	// 	this.setState({
-	// 		previewImage: file.url || file.thumbUrl,
-	// 		previewVisible: true
-	// 	});
-	// };
-
-	private handleTextChange = (e: any) => {
-		this.setState({ text: e.target.value });
+	public componentDidMount = async () => {
+		const data = await dynamoUtil.getPendingAddress('userId');
+		this.setState({ data: data });
+		console.log(data);
 	};
-	private onDrop = (pictureFiles: any, pictureDataURLs: any) => {
-		console.log(pictureFiles);
-		console.log(typeof pictureFiles);
-		console.log(pictureFiles[0].src);
-		console.log(pictureDataURLs);
-		base64 =
-			(document.getElementsByClassName('uploadPicture')[0] &&
-				document.getElementsByClassName('uploadPicture')[0].getAttribute('src')) ||
-			'';
-		this.setState({
-			pictures: this.state.pictures.concat(pictureFiles)
-		});
+	private toggle = () => {
+		this.setState({ collapsed: !this.state.collapsed });
 	};
 
-	private handleAddressChange = (add: string) => {
-		this.setState({ address: add });
-	};
-
-	private handleRadioChange = (e: any) => {
-		this.setState({ chain: e.target.value });
-	};
-	private handleSubmit = () => {
-		// const { userId } = this.props;
-		const { chain } = this.state;
-		const { text, address } = this.state;
-		console.log(text);
-		console.log({
-			userId: 'userId',
-			address: address,
-			description: text,
-			link: 'a',
-			twitter: 'a',
-			chain: chain
-		});
-		dynamoUtil
-			.addPendingAddress({
-				userId: 'userId',
-				address: address,
-				description: text,
-				link: 'a',
-				twitter: 'a',
-				chain: chain
-			})
-			.then(openNotification() as any);
-
-		const base64Data = new Buffer(base64.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-		const type = base64.split(';')[0].split('/')[1];
-		const userId = 1;
-		const params = {
-			Bucket: 'address-proof-image',
-			Key: `${userId}.${type}`,
-			Body: base64Data,
-			ACL: 'public-read',
-			ContentEncoding: 'base64',
-			ContentType: `image/${
-				type // type is not required // required
-			}`
-		}; // required. Notice the back ticks
-		console.log(params);
-		s3.upload(params, (err: any, data: any) => {
-			if (err) return console.log(err);
-			console.log(data);
-			console.log('Image successfully uploaded.');
-			openNotification('Image successfully uploaded.');
-		});
-		console.log('test');
+	private showItem = (ee: any) => {
+		this.setState({ showItem: ee.key });
+		console.log(ee.key);
 	};
 
 	public render() {
-		// const { account, password, loginError, loading } = this.state;
-		// const { getFieldDecorator } = this.props.form;
-		const { address, text } = this.state;
-		// const { previewVisible, previewImage, fileList } = this.state;
-		// const uploadButton = (
-		// 	<div>
-		// 		<Icon type="plus" />
-		// 		<div className="ant-upload-text">Upload</div>
-		// 	</div>
-		// );
+		const { userId } = this.props;
+		const { showItem, data } = this.state;
+		const list: any[] = [];
+		if (data)
+			data.forEach((e: any, i: any) => {
+				list.push(
+					<Menu.Item key={i}>
+						<Icon type="user" />
+						<span>{e.address}</span>
+					</Menu.Item>
+				);
+			});
 		return (
-			<SCard
-				title={<SCardTitle style={{ color: 'black' }}>Report Address</SCardTitle>}
-				margin="200px 0 0 0"
-				style={{ height: 'auto', width: 600 }}
-			>
-				<SDivFlexCenter horizontal padding="0 10px">
-					<SCardList>
-						<SDivFlexCenter horizontal style={{ marginTop: '5px' }}>
-							<SCardList noMargin>
-								<div className="status-list-wrapper">
-									<ul>
-										<li style={{ padding: '5px 5px' }}>
-											<span className="title" style={{ color: 'black' }}>
-												Report Address
-											</span>
-											<Radio.Group
-												defaultValue="a"
-												buttonStyle="solid"
-												style={{ marginLeft: 3 }}
-												onChange={(e: any) => this.handleRadioChange(e)}
-											>
-												<Radio.Button
-													value="BTC"
-													onChange={(e: any) => this.handleRadioChange(e)}
-													style={{ width: 100 }}
-												>
-													BTC
-												</Radio.Button>
-												<Radio.Button
-													value="ETH"
-													onChange={(e: any) => this.handleRadioChange(e)}
-													style={{ width: 100 }}
-												>
-													ETH
-												</Radio.Button>
-											</Radio.Group>
-										</li>
-									</ul>
-								</div>
-							</SCardList>
-						</SDivFlexCenter>
-						<SDivFlexCenter horizontal width="100%">
-							<SInput
-								right
-								placeholder="Address"
-								style={{ height: '30px', color: 'black' }}
-								width="80%"
-								value={address}
-								onChange={e => this.handleAddressChange(e.target.value)}
-							/>
-							<Radio.Group
-								defaultValue="a"
-								buttonStyle="solid"
-								style={{ marginLeft: 3 }}
-							>
-								<Radio.Button value="a" style={{ width: 53 }}>
-									fade
-								</Radio.Button>
-								<Radio.Button value="b" style={{ width: 53 }}>
-									true
-								</Radio.Button>
-							</Radio.Group>
-						</SDivFlexCenter>
-						<TextArea
-							rows={4}
-							placeholder="Please type in your description"
-							onChange={(e: any) => this.handleTextChange(e)}
+			<Layout style={{ width: '100%', height: 1000 }}>
+				<Sider trigger={null} collapsible collapsed={this.state.collapsed}>
+					<div className="logo" />
+					<Menu
+						theme="dark"
+						mode="inline"
+						onSelect={(ee: any) => this.showItem(ee)}
+						defaultSelectedKeys={['0']}
+					>
+						{list ? list : null}
+					</Menu>
+				</Sider>
+				<Layout>
+					<Header style={{ background: '#fff', padding: 0 }}>
+						<Icon
+							className="trigger"
+							type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+							onClick={this.toggle}
 						/>
-						<ImageUploader
-							withIcon={true}
-							buttonText="Choose images"
-							onChange={(e: any) => this.onDrop(e, e.webkitRelativePath)}
-							imgExtension={['.jpg', '.gif', '.png', '.gif']}
-							maxFileSize={5242880}
-							withPreview={true}
-							label={'accepted: jpg, gif, png'}
-							style={{ width: 550 }}
-						/>
-						<SDivFlexCenter horizontal width="100%" padding="10px">
-							<SButton
-								onClick={() =>
-									this.setState({
-										address: '',
-										pictures: []
-									})
-								}
-								width="49%"
-							>
-								Reset
-							</SButton>
-							<SButton
-								style={{ opacity: Number(text && address) === 0 ? 0.3 : 1 }}
-								width="49%"
-								onClick={this.handleSubmit}
-							>
-								Submit
-							</SButton>
-						</SDivFlexCenter>
-					</SCardList>
-				</SDivFlexCenter>
-			</SCard>
+					</Header>
+					<Content
+						style={{
+							margin: '24px 16px',
+							padding: 24,
+							background: '#fff',
+							minHeight: 280
+						}}
+					>
+						<ContentCard userId={userId} data={data} showItem={showItem} />
+					</Content>
+				</Layout>
+			</Layout>
 		);
 	}
 }

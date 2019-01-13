@@ -76,6 +76,9 @@ injectGlobal([
 		.SSCard {
 			background: ${ColorStyles.CardBackgroundDarkSolid} !important
 		}
+		.anticon {
+			margin-left: 10px
+		}
 	}
 `
 ] as any);
