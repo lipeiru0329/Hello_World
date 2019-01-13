@@ -4,6 +4,9 @@
 			"path": "."
 		},
 		{
+			"path": "..\\Play_Ground"
+		},
+		{
 			"path": "..\\AST"
 		},
 		{

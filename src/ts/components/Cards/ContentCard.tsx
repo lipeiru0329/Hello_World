@@ -4,13 +4,17 @@ import { Table } from 'antd';
 import { Input } from 'antd';
 import { Icon, notification } from 'antd';
 import * as React from 'react';
-// import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
+import * as CST from 'ts/common/constants';
+import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
 import Web3Wrapper from '../../../../../astContractWrapper/src/Web3Wrapper';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
-import * as CST from 'ts/common/constants';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
+
+const contractAbi = require('../../../../../astContractWrapper/src/static/AST.json');
+
 export const web3Wrapper = new Web3Wrapper(window, 'https://kovan.infura.io');
+export const contractWrapper = new ContractWrapper(web3Wrapper, contractAbi.abi, CST.CONTRACT_ADDR);
 // .contractWrapper = new ContractWrapper(web3Wrapper, contractAbi.abi, CST.CONTRACT_ADDR);
 const openNotification = (e?: string) => {
 	notification.open({
@@ -34,6 +38,7 @@ interface IState {
 	approve: number;
 	amount: number;
 	toAddreses: string;
+	stakeAmt: number;
 }
 const { TextArea } = Input;
 
@@ -57,7 +62,16 @@ dynamoUtil.init(config);
 export default class ContentCard extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
-		this.state = { address: '', text: '', pictures: [], chain: '', approve: 0 , amount: 0, toAddreses: "0x0"};
+		this.state = {
+			address: '',
+			text: '',
+			pictures: [],
+			chain: '',
+			approve: 0,
+			amount: 0,
+			toAddreses: '0x0',
+			stakeAmt: 0
+		};
 	}
 
 	// private normFile = (e: any) => {
@@ -99,6 +113,12 @@ export default class ContentCard extends React.Component<IProps, IState> {
 		});
 	};
 
+	private handleStakeChange = (amt: string) => {
+		this.setState({
+			stakeAmt: Number(amt)
+		});
+	};
+
 	private approve = () => {
 		console.log((window as any).web3.currentProvider);
 		web3Wrapper.erc20Approve(
@@ -106,6 +126,13 @@ export default class ContentCard extends React.Component<IProps, IState> {
 			CST.PLATFORM_ADDR,
 			(window as any).web3.currentProvider.selectedAddress,
 			this.state.approve
+		);
+	};
+
+	private stakeToken = () => {
+		contractWrapper.stake(
+			(window as any).web3.currentProvider.selectedAddress,
+			this.state.stakeAmt
 		);
 	};
 
@@ -152,7 +179,7 @@ export default class ContentCard extends React.Component<IProps, IState> {
 	};
 	public render() {
 		const { data, showItem } = this.props;
-		const { address, approve, amount, toAddreses } = this.state;
+		const { address, approve, amount, toAddreses, stakeAmt } = this.state;
 		const list: any[] = [];
 		if (data) {
 			list.push(data[Number(showItem)]);
@@ -252,6 +279,19 @@ export default class ContentCard extends React.Component<IProps, IState> {
 							/>
 							<SButton width="20%" onClick={this.approve}>
 								Approve
+							</SButton>
+						</SDivFlexCenter>
+						<SDivFlexCenter horizontal width="100%" padding="10px">
+							<SInput
+								right
+								placeholder="stakeAmount"
+								style={{ height: '30px', color: 'black' }}
+								width="80%"
+								value={stakeAmt}
+								onChange={e => this.handleStakeChange(e.target.value)}
+							/>
+							<SButton width="20%" onClick={this.stakeToken}>
+								Stake
 							</SButton>
 						</SDivFlexCenter>
 						<SDivFlexCenter horizontal width="100%" padding="10px">
