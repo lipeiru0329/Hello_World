@@ -1,3 +1,5 @@
+export * from '../../../../astContractWrapper/src/common/constants';
+
 export const AC_AUTH = 'auth';
 
 export const AC_USERID = 'userid';

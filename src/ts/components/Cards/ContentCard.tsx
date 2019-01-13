@@ -7,7 +7,7 @@ import * as React from 'react';
 // import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
 import Web3Wrapper from '../../../../../astContractWrapper/src/Web3Wrapper';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
-// import * as CST from 'ts/common/constants';
+import * as CST from 'ts/common/constants';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
 export const web3Wrapper = new Web3Wrapper(window, 'https://kovan.infura.io');
@@ -32,6 +32,8 @@ interface IState {
 	text: string;
 	chain: string;
 	approve: number;
+	amount: number;
+	toAddreses: string;
 }
 const { TextArea } = Input;
 
@@ -55,7 +57,7 @@ dynamoUtil.init(config);
 export default class ContentCard extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
-		this.state = { address: '', text: '', pictures: [], chain: '', approve: 0 };
+		this.state = { address: '', text: '', pictures: [], chain: '', approve: 0 , amount: 0, toAddreses: "0x0"};
 	}
 
 	// private normFile = (e: any) => {
@@ -85,13 +87,34 @@ export default class ContentCard extends React.Component<IProps, IState> {
 		});
 	};
 
+	private handleAmountChange = (am: string) => {
+		this.setState({
+			amount: Number(am)
+		});
+	};
+
+	private handleToAddrChange = (addr: string) => {
+		this.setState({
+			toAddreses: addr
+		});
+	};
+
 	private approve = () => {
 		console.log((window as any).web3.currentProvider);
 		web3Wrapper.erc20Approve(
-			'0x8CDB3126a6eB2781A0a766E27DE1dE5c592bf096',
-			'0x08cb8054201a9FdfE63fbdB1b3028E12d284D0dD',
+			CST.CONTRACT_ADDR,
+			CST.PLATFORM_ADDR,
 			(window as any).web3.currentProvider.selectedAddress,
 			this.state.approve
+		);
+	};
+
+	private transferToken = () => {
+		web3Wrapper.erc20Transfer(
+			CST.CONTRACT_ADDR,
+			(window as any).web3.currentProvider.selectedAddress,
+			this.state.toAddreses,
+			this.state.amount
 		);
 	};
 
@@ -129,7 +152,7 @@ export default class ContentCard extends React.Component<IProps, IState> {
 	};
 	public render() {
 		const { data, showItem } = this.props;
-		const { address, approve } = this.state;
+		const { address, approve, amount, toAddreses } = this.state;
 		const list: any[] = [];
 		if (data) {
 			list.push(data[Number(showItem)]);
@@ -196,6 +219,28 @@ export default class ContentCard extends React.Component<IProps, IState> {
 								Submit
 							</SButton>
 						</SDivFlexCenter>
+						<SDivFlexCenter horizontal width="100%" padding="10px">
+							<SInput
+								right
+								placeholder="toAddres"
+								style={{ height: '30px', color: 'black' }}
+								width="60%"
+								value={toAddreses}
+								onChange={e => this.handleToAddrChange(e.target.value)}
+							/>
+							<SInput
+								right
+								placeholder="amount"
+								style={{ height: '30px', color: 'black' }}
+								width="20%"
+								value={amount}
+								onChange={e => this.handleAmountChange(e.target.value)}
+							/>
+							<SButton width="20%" onClick={this.transferToken}>
+								Transfer
+							</SButton>
+						</SDivFlexCenter>
+
 						<SDivFlexCenter horizontal width="100%" padding="10px">
 							<SInput
 								right
