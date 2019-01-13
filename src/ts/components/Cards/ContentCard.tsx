@@ -194,16 +194,18 @@ export default class ContentCard extends React.Component<IProps, IState> {
 		const { data, showItem } = this.props;
 		const { address, approve, amount, toAddreses, stakeAmt, score, repos } = this.state;
 		const list: any[] = [];
+		let string123 = '';
 		if (data && data.length > Number(showItem)) {
 			list.push(data[Number(showItem)]);
 			console.log(data);
+			string123 = 'https://etherscan.io/address/' + data[Number(showItem)].address;
 		}
 		const columns = [
 			{
 				title: 'address',
 				dataIndex: 'address',
 				key: 'address',
-				render: (add: any) => <a href="">{add}</a>
+				render: (add: any) => <a href={string123}>{add}</a>
 			},
 			{ title: 'chain', dataIndex: 'chain', key: 'chain' },
 			{ title: 'description', dataIndex: 'description', key: 'description' },
