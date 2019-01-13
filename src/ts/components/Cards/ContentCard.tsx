@@ -1,13 +1,16 @@
-import { Radio } from 'antd';
+import { Divider, Radio } from 'antd';
+import { Icon, notification } from 'antd';
 // import { Icon } from 'antd';
 import { Table } from 'antd';
 import { Input } from 'antd';
-import { Icon, notification } from 'antd';
 import * as React from 'react';
 import * as CST from 'ts/common/constants';
 import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
+import util from '../../../../../astContractWrapper/src/util';
+// import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
 import Web3Wrapper from '../../../../../astContractWrapper/src/Web3Wrapper';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
+import httpUtil from '../../../../../coinTrust/src/utils/httpUtil';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
 
@@ -39,6 +42,8 @@ interface IState {
 	amount: number;
 	toAddreses: string;
 	stakeAmt: number;
+	score: number;
+	repos: string;
 }
 const { TextArea } = Input;
 
@@ -70,53 +75,30 @@ export default class ContentCard extends React.Component<IProps, IState> {
 			approve: 0,
 			amount: 0,
 			toAddreses: '0x0',
-			stakeAmt: 0
+			stakeAmt: 0,
+			score: 0,
+			repos: ''
 		};
 	}
-
-	// private normFile = (e: any) => {
-	// 	console.log('Upload event:', e);
-	// 	// if (Array.isArray(e)) {
-	// 	// 	return e;
-	// 	// }
-	// 	// return e && e.fileList;
-	// };
-
-	// private handleCancel = () => this.setState({ previewVisible: false });
-
-	// private handlePreview = (file: any) => {
-	// 	this.setState({
-	// 		previewImage: file.url || file.thumbUrl,
-	// 		previewVisible: true
-	// 	});
-	// };
 
 	private handleTextChange = (e: any) => {
 		this.setState({ text: e.target.value });
 	};
 
 	private handleApproveChange = (am: string) => {
-		this.setState({
-			approve: Number(am)
-		});
+		this.setState({ approve: Number(am) });
 	};
 
 	private handleAmountChange = (am: string) => {
-		this.setState({
-			amount: Number(am)
-		});
+		this.setState({ amount: Number(am) });
 	};
 
 	private handleToAddrChange = (addr: string) => {
-		this.setState({
-			toAddreses: addr
-		});
+		this.setState({ toAddreses: addr });
 	};
 
 	private handleStakeChange = (amt: string) => {
-		this.setState({
-			stakeAmt: Number(amt)
-		});
+		this.setState({ stakeAmt: Number(amt) });
 	};
 
 	private approve = () => {
@@ -127,6 +109,15 @@ export default class ContentCard extends React.Component<IProps, IState> {
 			(window as any).web3.currentProvider.selectedAddress,
 			this.state.approve
 		);
+	};
+
+	private parseScore = () => {
+		dynamoUtil.addScore({
+			address: this.state.address,
+			verifierId: this.props.userId,
+			timestamp: Number(util.getUTCNowTimestamp),
+			score: this.state.score
+		});
 	};
 
 	private stakeToken = () => {
@@ -145,7 +136,19 @@ export default class ContentCard extends React.Component<IProps, IState> {
 		);
 	};
 
-	private query = () => {
+	private handleScoreChange = (e: any) => {
+		this.setState({
+			score: Number(e)
+		});
+	};
+
+	private query = async () => {
+		const response = await httpUtil.get(
+			'http://localhost:3000/?userId=id2&address=0x11B73358799D057D195fCeC8B93C70E54E39da27&chain=ETH'
+		);
+		this.setState({
+			repos: response
+		});
 		console.log(this.state.address);
 	};
 
@@ -179,7 +182,7 @@ export default class ContentCard extends React.Component<IProps, IState> {
 	};
 	public render() {
 		const { data, showItem } = this.props;
-		const { address, approve, amount, toAddreses, stakeAmt } = this.state;
+		const { address, approve, amount, toAddreses, stakeAmt, score, repos } = this.state;
 		const list: any[] = [];
 		if (data) {
 			list.push(data[Number(showItem)]);
@@ -190,13 +193,31 @@ export default class ContentCard extends React.Component<IProps, IState> {
 				title: 'address',
 				dataIndex: 'address',
 				key: 'address',
-				render: (add: any) => <a href="javascript:;">{add}</a>
+				render: (add: any) => <a href="">{add}</a>
 			},
 			{ title: 'chain', dataIndex: 'chain', key: 'chain' },
 			{ title: 'description', dataIndex: 'description', key: 'description' },
 			{ title: 'link', dataIndex: 'link', key: 'link' },
 			{ title: 'twitter', dataIndex: 'twitter', key: 'twitter' },
-			{ title: 'userId', dataIndex: 'userId', key: 'userId' }
+			{ title: 'userId', dataIndex: 'userId', key: 'userId' },
+			{
+				title: 'Action',
+				key: 'action',
+				render: () => (
+					<span>
+						<SInput
+							right
+							placeholder="amount"
+							style={{ height: '30px', color: 'black' }}
+							width="50%"
+							value={score}
+							onChange={e => this.handleScoreChange(e.target.value)}
+						/>
+						<Divider type="vertical" />
+						<a onClick={this.parseScore}>Confirm</a>
+					</span>
+				)
+			}
 		];
 		return (
 			<SCard
@@ -306,6 +327,7 @@ export default class ContentCard extends React.Component<IProps, IState> {
 							<SButton width="20%" onClick={this.query}>
 								Query
 							</SButton>
+							<li>{repos}</li>
 						</SDivFlexCenter>
 					</SCardList>
 				</SDivFlexCenter>
