@@ -12,4 +12,5 @@ prices
 coverage
 *.txt
 keys
+key
 webpack.json
