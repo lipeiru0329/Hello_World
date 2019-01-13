@@ -1,4 +1,5 @@
 import { Icon, Layout, Menu } from 'antd';
+import { Tag } from 'antd';
 // import { Icon } from 'antd';
 // import { Input } from 'antd';
 // import { notification } from 'antd';
@@ -24,12 +25,21 @@ interface IState {
 	data: any;
 	showItem: string;
 	userId12: string;
+	token: number;
+	stake: number;
 }
 
 export default class ReportAddress extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
-		this.state = { collapsed: false, data: null, showItem: '0', userId12: '' };
+		this.state = {
+			collapsed: false,
+			data: null,
+			showItem: '0',
+			userId12: '',
+			token: 0,
+			stake: 0
+		};
 	}
 
 	public componentDidMount = async () => {
@@ -44,12 +54,12 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 	};
 
 	private handleUserIdChange = (e: any) => {
-		console.log(e);
 		this.setState({ userId12: e });
 	};
 
 	private search = async () => {
 		const { userId12 } = this.state;
+		console.log(userId12);
 		const data = await dynamoUtil.getPendingAddress(userId12);
 		this.setState({ data: data });
 		console.log('123');
@@ -62,7 +72,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 
 	public render() {
 		const { userId } = this.props;
-		const { showItem, data, userId12 } = this.state;
+		const { showItem, data, userId12, token, stake } = this.state;
 		const list: any[] = [];
 		if (data)
 			data.forEach((e: any, i: any) => {
@@ -93,9 +103,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 					<SButton
 						disable={userId12 === ''}
 						onClick={this.search}
-						style={{
-							display: this.state.collapsed ? 'none' : 'block'
-						}}
+						style={{ display: this.state.collapsed ? 'none' : 'block' }}
 					>
 						Search by UserId
 					</SButton>
@@ -115,6 +123,15 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 							type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
 							onClick={this.toggle}
 						/>
+						<Tag color="#108ee9" style={{ marginLeft: 20 }}>
+							Token Balance: {token}
+						</Tag>
+						<Tag color="#108ee9" style={{ marginLeft: 20 }}>
+							Has Varified
+						</Tag>
+						<Tag color="#108ee9" style={{ marginLeft: 20 }}>
+							Stake Amount: {stake}
+						</Tag>
 					</Header>
 					<Content
 						style={{
