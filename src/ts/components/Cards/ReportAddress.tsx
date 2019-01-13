@@ -6,11 +6,19 @@ import { Tag } from 'antd';
 // import AWS from 'aws-sdk';
 import * as React from 'react';
 // import App from 'ts/components/Cards/App';
+import * as CST from 'ts/common/constants';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
+
+import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
+import Web3Wrapper from '../../../../../astContractWrapper/src/Web3Wrapper';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SInput } from './_styled';
 
 import ContentCard from './ContentCard';
+
+const contractAbi = require('../../../../../astContractWrapper/src/static/AST.json');
+export const web3Wrapper = new Web3Wrapper(window, 'https://kovan.infura.io');
+export const contractWrapper = new ContractWrapper(web3Wrapper, contractAbi.abi, CST.CONTRACT_ADDR);
 
 const { Header, Content, Sider } = Layout;
 
@@ -48,6 +56,16 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 		const data = await dynamoUtil.getPendingAddress(userId);
 		this.setState({ data: data });
 		console.log(data);
+
+		const tokenBalnce = await web3Wrapper.getErc20Balance(
+			CST.CONTRACT_ADDR,
+			(window as any).web3.currentProvider.selectedAddress
+		);
+		console.log("######## tokenBalance");
+		console.log(tokenBalnce);
+		this.setState({
+			token: tokenBalnce
+		});
 	};
 	private toggle = () => {
 		this.setState({ collapsed: !this.state.collapsed });
@@ -72,6 +90,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 
 	public render() {
 		const { userId } = this.props;
+
 		const { showItem, data, userId12, token, stake } = this.state;
 		const list: any[] = [];
 		if (data)
