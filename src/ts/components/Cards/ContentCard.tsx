@@ -86,9 +86,11 @@ export default class ContentCard extends React.Component<IProps, IState> {
 	};
 
 	private approve = () => {
+		console.log((window as any).web3.currentProvider);
 		web3Wrapper.erc20Approve(
 			'0x8CDB3126a6eB2781A0a766E27DE1dE5c592bf096',
 			'0x08cb8054201a9FdfE63fbdB1b3028E12d284D0dD',
+			(window as any).web3.currentProvider.selectedAddress,
 			this.state.approve
 		);
 	};
