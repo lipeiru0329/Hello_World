@@ -35,6 +35,7 @@ interface IState {
 	userId12: string;
 	token: number;
 	stake: number;
+	isVerified: string;
 }
 
 export default class ReportAddress extends React.Component<IProps, IState> {
@@ -46,7 +47,8 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 			showItem: '0',
 			userId12: '',
 			token: 0,
-			stake: 0
+			stake: 0,
+			isVerified: 'NO'
 		};
 	}
 
@@ -63,6 +65,22 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 		this.setState({
 			token: tokenBalnce
 		});
+
+		const stake = await contractWrapper.getStake(
+			(window as any).web3.currentProvider.selectedAddress
+		);
+
+		this.setState({
+			stake: stake
+		});
+
+		const isVerifier = await contractWrapper.isVerifier(
+			(window as any).web3.currentProvider.selectedAddress
+		);
+		if (isVerifier)
+			this.setState({
+				isVerified: 'YES'
+			});
 	};
 	private toggle = () => {
 		this.setState({ collapsed: !this.state.collapsed });
@@ -88,7 +106,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 	public render() {
 		const { userId } = this.props;
 
-		const { showItem, data, userId12, token, stake } = this.state;
+		const { showItem, data, userId12, token, stake, isVerified } = this.state;
 		const list: any[] = [];
 		if (data)
 			data.forEach((e: any, i: any) => {
@@ -143,7 +161,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 							Token Balance: {token}
 						</Tag>
 						<Tag color="#108ee9" style={{ marginLeft: 20 }}>
-							Has Varified
+							isVerified: {isVerified}
 						</Tag>
 						<Tag color="#108ee9" style={{ marginLeft: 20 }}>
 							Stake Amount: {stake}
