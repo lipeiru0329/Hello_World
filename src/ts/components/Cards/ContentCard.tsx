@@ -10,7 +10,7 @@ import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
 // import * as CST from 'ts/common/constants';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
-export const web3Wrapper = new Web3Wrapper(window, '', 'https://kovan.infura.io');
+export const web3Wrapper = new Web3Wrapper(window, 'https://kovan.infura.io');
 // .contractWrapper = new ContractWrapper(web3Wrapper, contractAbi.abi, CST.CONTRACT_ADDR);
 const openNotification = (e?: string) => {
 	notification.open({
