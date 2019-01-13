@@ -6,11 +6,11 @@ import { Input } from 'antd';
 import * as React from 'react';
 import * as CST from 'ts/common/constants';
 import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
-import util from '../../../../../astContractWrapper/src/util';
+// import util from '../../../../../astContractWrapper/src/util';
 // import ContractWrapper from '../../../../../astContractWrapper/src/ContractWrapper';
 import Web3Wrapper from '../../../../../astContractWrapper/src/Web3Wrapper';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
-import httpUtil from '../../../../../coinTrust/src/utils/httpUtil';
+// import httpUtil from '../../../../../coinTrust/src/utils/httpUtil';
 import { SDivFlexCenter } from '../_styled';
 import { SButton, SCard, SCardList, SCardTitle, SInput } from './_styled';
 
@@ -112,11 +112,20 @@ export default class ContentCard extends React.Component<IProps, IState> {
 	};
 
 	private parseScore = () => {
+		const { address, score } = this.state;
+		const { userId, data, showItem } = this.props;
+		console.log({
+			address: address,
+			verifierId: userId,
+			timestamp: 123367890,
+			score: score
+		});
 		dynamoUtil.addScore({
-			address: this.state.address,
-			verifierId: this.props.userId,
-			timestamp: Number(util.getUTCNowTimestamp),
-			score: this.state.score
+			address:
+				data && data.length > Number(showItem) ? data[Number(showItem)].address : '0x00',
+			verifierId: (window as any).web3.currentProvider.selectedAddress,
+			timestamp: 123367890,
+			score: score
 		});
 	};
 
@@ -143,13 +152,14 @@ export default class ContentCard extends React.Component<IProps, IState> {
 	};
 
 	private query = async () => {
-		const response = await httpUtil.get(
-			'http://localhost:3000/?userId=id2&address=0x11B73358799D057D195fCeC8B93C70E54E39da27&chain=ETH'
-		);
-		this.setState({
-			repos: response
-		});
-		console.log(this.state.address);
+		// const response = await httpUtil.get(
+		// 	'http://localhost:3000/?userId=id2&address=0x11B73358799D057D195fCeC8B93C70E54E39da27&chain=ETH'
+		// );
+		// this.setState({
+		// 	repos: response
+		// });
+		// console.log(this.state.address);
+		console.log('123');
 	};
 
 	private handleAddressChange = (add: string) => {
@@ -184,7 +194,7 @@ export default class ContentCard extends React.Component<IProps, IState> {
 		const { data, showItem } = this.props;
 		const { address, approve, amount, toAddreses, stakeAmt, score, repos } = this.state;
 		const list: any[] = [];
-		if (data) {
+		if (data && data.length > Number(showItem)) {
 			list.push(data[Number(showItem)]);
 			console.log(data);
 		}
@@ -223,7 +233,11 @@ export default class ContentCard extends React.Component<IProps, IState> {
 			<SCard
 				title={
 					<SCardTitle style={{ color: 'black' }}>
-						{`Report Address ${data ? data[Number(showItem)].chain : '-'}`}
+						{`Report Address ${
+							data && data.length > Number(showItem)
+								? data[Number(showItem)].chain
+								: '-'
+						}`}
 					</SCardTitle>
 				}
 				style={{ height: 'auto', width: '100%' }}
@@ -232,7 +246,11 @@ export default class ContentCard extends React.Component<IProps, IState> {
 				<SDivFlexCenter horizontal padding="0 10px">
 					<SCardList>
 						<SDivFlexCenter horizontal width="100%">
-							<li>{data ? data[Number(showItem)].address : '-'} </li>
+							<li>
+								{data && data.length > Number(showItem)
+									? data[Number(showItem)].address
+									: '-'}{' '}
+							</li>
 							<Radio.Group
 								defaultValue="a"
 								buttonStyle="solid"

@@ -56,13 +56,10 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 		const data = await dynamoUtil.getPendingAddress(userId);
 		this.setState({ data: data });
 		console.log(data);
-
 		const tokenBalnce = await web3Wrapper.getErc20Balance(
 			CST.CONTRACT_ADDR,
 			(window as any).web3.currentProvider.selectedAddress
 		);
-		console.log("######## tokenBalance");
-		console.log(tokenBalnce);
 		this.setState({
 			token: tokenBalnce
 		});
