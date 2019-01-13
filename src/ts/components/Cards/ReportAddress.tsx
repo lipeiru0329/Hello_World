@@ -6,6 +6,9 @@ import { Icon, Layout, Menu } from 'antd';
 import * as React from 'react';
 // import App from 'ts/components/Cards/App';
 import dynamoUtil from '../../../../../coinTrust/src/utils/dynamoUtil';
+import { SDivFlexCenter } from '../_styled';
+import { SButton, SInput } from './_styled';
+
 import ContentCard from './ContentCard';
 
 const { Header, Content, Sider } = Layout;
@@ -20,21 +23,36 @@ interface IState {
 	collapsed: boolean;
 	data: any;
 	showItem: string;
+	userId12: string;
 }
 
 export default class ReportAddress extends React.Component<IProps, IState> {
 	constructor(props: any) {
 		super(props);
-		this.state = { collapsed: false, data: null, showItem: '0' };
+		this.state = { collapsed: false, data: null, showItem: '0', userId12: '' };
 	}
 
 	public componentDidMount = async () => {
-		const data = await dynamoUtil.getPendingAddress('userId');
+		const { userId } = this.props;
+		console.log(userId);
+		const data = await dynamoUtil.getPendingAddress(userId);
 		this.setState({ data: data });
 		console.log(data);
 	};
 	private toggle = () => {
 		this.setState({ collapsed: !this.state.collapsed });
+	};
+
+	private handleUserIdChange = (e: any) => {
+		console.log(e);
+		this.setState({ userId12: e });
+	};
+
+	private search = async () => {
+		const { userId12 } = this.state;
+		const data = await dynamoUtil.getPendingAddress(userId12);
+		this.setState({ data: data });
+		console.log('123');
 	};
 
 	private showItem = (ee: any) => {
@@ -44,7 +62,7 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 
 	public render() {
 		const { userId } = this.props;
-		const { showItem, data } = this.state;
+		const { showItem, data, userId12 } = this.state;
 		const list: any[] = [];
 		if (data)
 			data.forEach((e: any, i: any) => {
@@ -59,6 +77,28 @@ export default class ReportAddress extends React.Component<IProps, IState> {
 			<Layout style={{ width: '100%', height: 1000 }}>
 				<Sider trigger={null} collapsible collapsed={this.state.collapsed}>
 					<div className="logo" />
+					<SDivFlexCenter horizontal width="100%" padding="10px">
+						<SInput
+							right
+							placeholder="Approve Amount"
+							style={{
+								height: '30px',
+								color: 'black',
+								display: this.state.collapsed ? 'none' : 'block'
+							}}
+							value={userId12}
+							onChange={e => this.handleUserIdChange(e.target.value)}
+						/>
+					</SDivFlexCenter>
+					<SButton
+						disable={userId12 === ''}
+						onClick={this.search}
+						style={{
+							display: this.state.collapsed ? 'none' : 'block'
+						}}
+					>
+						Search by UserId
+					</SButton>
 					<Menu
 						theme="dark"
 						mode="inline"
